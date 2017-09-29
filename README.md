@@ -13,6 +13,8 @@ The workflow is as follows:
 1. Once finished processing, the Cloud Speech API returns a text file to the Cloud Function
 1. The Cloud Function writes the text file to another bucket that isn't being monitored
 
+![architecture diagram](/images/architecture.png)
+
 ## Caveat
 Currently, the Cloud Function is hard-coded to only accept audio files with the following characteristics:
 - Format: FLAC
