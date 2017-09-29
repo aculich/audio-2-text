@@ -28,7 +28,6 @@ exports.audio2text = function(event, callback) {
 			console.log('File ' + audioFile.name + ' metadata updated.');
 		};
 
-		//const projectId = 'audio-2-text';
 		// Set GCloud project ID
 		const projectId = process.env.GCLOUD_PROJECT;
 
@@ -41,10 +40,8 @@ exports.audio2text = function(event, callback) {
 			projectId: projectId
 		});
 
-		const projectName = process.env.GCP_PROJECT;
-		const customerCode = 'customer-tohpiej7ee6aevee'
-		const audioBucketName = projectName + '-' + customerCode + '-audio'
-		const textBucketName = projectName + '-' + customerCode + '-text'
+		const audioBucketName = <AUDIO_BUCKET_NAME_HERE>
+		const textBucketName = <TEXT_BUCKET_NAME_HERE>
 
 		var audioBucket = storageClient.bucket(audioBucketName);
 		var textBucket = storageClient.bucket(textBucketName);
@@ -77,7 +74,6 @@ exports.audio2text = function(event, callback) {
 				// completion of the operation.
 				operation.on('complete', function(response, metadata, finalApiResponse) {
 
-					//const transcription = response.results[0].alternatives[0].transcript;
 					const transcription = response.results.map(result =>
 						result.alternatives[0].transcript).join('\n');
 					const fileName = rewrite(audioFile.name, '.txt');
@@ -114,5 +110,5 @@ exports.audio2text = function(event, callback) {
 		});
 	};
 
-	callback();
+	callback(null, 'Success!');
 };
