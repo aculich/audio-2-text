@@ -52,11 +52,11 @@ exports.audio2text = function(event, callback) {
       console.log('GCLOUD_PROJECT: ' + projectId);
 
       // Instantiate Google Cloud services clients
-      var speech = Speech({
+      const storage = new Storage({
         projectId: projectId,
       });
 
-      var storage = Storage({
+      const speech = new Speech.SpeechClient({
         projectId: projectId,
       });
 
@@ -64,7 +64,7 @@ exports.audio2text = function(event, callback) {
       var textBucket = storage.bucket(textBucketName);
 
       // Create request configuration to be passed along the API call request
-      const encoding = Speech.v1.types.RecognitionConfig.AudioEncoding.FLAC;
+      const encoding = 'FLAC';
       const sampleRateHertz = 44100;
       const languageCode = 'en-US';
       const config = {
@@ -81,16 +81,20 @@ exports.audio2text = function(event, callback) {
         audio: audio,
       };
 
+      console.log('Calling Speech API');
       // Initiate API call to the Cloud Speech service
       speech.longRunningRecognize(request)
         .then((responses) => {
           // Operation promise starts polling for the completion of the LRO.
+          console.log('Polling for the completion of the LRO');
           return responses[0].promise();
         })
         .then((responses) => {
+          console.log('Received final response from LRO');
           // The final result of the operation (responses[0]).
-          const transcription = responses[0].results.map(result =>
-            result.alternatives[0].transcript).join('\n');
+          const transcription = responses[0].results
+            .map(result => result.alternatives[0].transcript)
+            .join('\n');
           const fileName = rewrite(file.name, '.txt');
           const tempFilePath = path.join(os.tmpdir(), fileName);
 
@@ -109,10 +113,12 @@ exports.audio2text = function(event, callback) {
         .catch((err) => {
           callback(err);
         });
+
+      callback();
     })
     .catch((err) => {
       callback(err);
     });
 
-  callback();
+  // callback();
 };
