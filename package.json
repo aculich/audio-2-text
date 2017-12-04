@@ -4,10 +4,18 @@
   "description": "Audio-2-Text is a Google Cloud Functions invocation that calls Google Cloud Speech API when audio files are uploaded to Google Cloud Storage",
   "main": "index.js",
   "dependencies": {
+    "@google-cloud/speech": "^0.11.0",
+    "@google-cloud/storage": "^1.5.0",
     "eslint": "^4.12.1",
-    "eslint-config-strongloop": "^2.1.0"
+    "eslint-config-strongloop": "^2.1.0",
+    "fs": "0.0.1-security",
+    "os": "^0.1.1",
+    "path": "^0.12.7",
+    "rewrite-ext": "^1.0.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "util": "^0.10.3"
+  },
   "scripts": {
     "pretest": "eslint --ignore-path .gitignore ."
   },
@@ -23,12 +31,7 @@
     "Google",
     "Cloud",
     "Functions",
-    "Google",
-    "Cloud",
-    "Speech",
-    "API",
-    "Google",
-    "Cloud",
+    "SpeechAPI",
     "Storage",
     "GCP"
   ],
