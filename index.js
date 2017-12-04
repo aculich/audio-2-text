@@ -10,105 +10,98 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const rewrite = require('rewrite-ext');
-const speech = require('@google-cloud/speech');
-const storage = require('@google-cloud/storage');
-const util = require('util');
+const Speech = require('@google-cloud/speech');
+const Storage = require('@google-cloud/storage');
+// const util = require('util');
 
 exports.audio2text = function(event, callback) {
 
-	const audioFile = event.data;
+  const file = event.data;
 
-	// Check status of uploaded object
-	if (audioFile.resourceState === 'not_exists') {
-		console.log('File ' + audioFile.name + ' was deleted. Nothing to do.');
-	} else {
-		if (audioFile.metageneration === '1') {
-			console.log('New file ' + audioFile.name + ' uploaded to storage bucket.');
-		} else {
-			console.log('File ' + audioFile.name + ' metadata updated.');
-		};
+  // Check status of uploaded object
+  if (file.resourceState === 'not_exists') {
+    console.log('File was deleted from audio storage bucket');
+    console.log('File name: ' + file.name);
+    console.log('Nothing to do');
+    console.log('Function execution ending');
+    callback();
+    return;
+  }
 
-		// Set GCloud project ID
-		const projectId = process.env.GCLOUD_PROJECT;
+  if (file.metageneration === '1') {
+    console.log('New file uploaded to audio storage bucket');
+    console.log('File name: ' + file.name);
+  } else {
+    console.log('Existing file metadata updated in audio storage bucket');
+    console.log('File name: ' + file.name);
+  }
 
-		// Instantiate Google Cloud services clients
-		var speechApiClient = speech({
-			projectId: projectId
-		});
+  console.log('Beginning transcription process');
 
-		var storageClient = storage({
-			projectId: projectId
-		});
+  // Set GCloud project ID
+  const projectId = process.env.GCLOUD_PROJECT;
 
-		const audioBucketName = <AUDIO_BUCKET_NAME_HERE>
-		const textBucketName = <TEXT_BUCKET_NAME_HERE>
+  // Instantiate Google Cloud services clients
+  var speech = Speech({
+    projectId: projectId,
+  });
 
-		var audioBucket = storageClient.bucket(audioBucketName);
-		var textBucket = storageClient.bucket(textBucketName);
+  var storage = Storage({
+    projectId: projectId,
+  });
 
-		// Create request configuration to be passed along the API call request
-		const encoding = speech.v1.types.RecognitionConfig.AudioEncoding.FLAC;
-		const sampleRateHertz = 44100;
-		const languageCode = 'en-US';
-		const config = {
-			encoding : encoding,
-			sampleRateHertz : sampleRateHertz,
-			languageCode : languageCode
-		};
-		const uri = 'gs://' + audioBucketName + '/' + audioFile.name;
-		const audio = {
-			uri : uri
-		};
-		const request = {
-			config: config,
-			audio: audio
-		};
+  const audioBucketName = 'audio-2-text-customer-tohpiej7ee6aevee-audio';
+  const textBucketName = 'audio-2-text-customer-tohpiej7ee6aevee-text';
 
-		// Initiate API call to the Cloud Speech service
-		speechApiClient.longRunningRecognize(request)
-			.then(function(responses) {
-				var operation = responses[0];
-				var initialApiResponse = responses[1];
+  // var audioBucket = storage.bucket(audioBucketName);
+  var textBucket = storage.bucket(textBucketName);
 
-				// Adding a listener for the 'complete' event starts polling for the
-				// completion of the operation.
-				operation.on('complete', function(response, metadata, finalApiResponse) {
+  // Create request configuration to be passed along the API call request
+  const encoding = Speech.v1.types.RecognitionConfig.AudioEncoding.FLAC;
+  const sampleRateHertz = 44100;
+  const languageCode = 'en-US';
+  const config = {
+    encoding: encoding,
+    sampleRateHertz: sampleRateHertz,
+    languageCode: languageCode,
+  };
+  const uri = 'gs://' + audioBucketName + '/' + file.name;
+  const audio = {
+    uri: uri,
+  };
+  const request = {
+    config: config,
+    audio: audio,
+  };
 
-					const transcription = response.results.map(result =>
-						result.alternatives[0].transcript).join('\n');
-					const fileName = rewrite(audioFile.name, '.txt');
-					const tempFilePath = path.join(os.tmpdir(), fileName);
+  // Initiate API call to the Cloud Speech service
+  speech.longRunningRecognize(request)
+    .then((responses) => {
+      // Operation promise starts polling for the completion of the LRO.
+      return responses[0].promise();
+    })
+    .then((responses) => {
+      // The final result of the operation (responses[0]).
+      const transcription = responses[0].results.map(result =>
+        result.alternatives[0].transcript).join('\n');
+      const fileName = rewrite(file.name, '.txt');
+      const tempFilePath = path.join(os.tmpdir(), fileName);
 
-					// Write file temporarily to local filesystem
-					fs.writeFile(tempFilePath, transcription, function(err) {
-						console.error(err);
-					});
-					console.log('Transcription written temporarily to ' + tempFilePath);
+      // Write file temporarily to local filesystem
+      fs.writeFile(tempFilePath, transcription, (err) => {
+        if (err) { throw new Error(err); }
+      });
+      console.log('Transcription written temporarily to ' + tempFilePath);
 
-					// Upload transcription to Cloud Storage
-					textBucket.upload(tempFilePath, function(err) {
-						console.error(err);
-					});
-					console.log('Transcription uploaded to storage bucket');
-				});
+      // Upload transcription to Cloud Storage
+      textBucket.upload(tempFilePath, (err) => {
+        if (err) { throw new Error(err); }
+      });
+      console.log('Transcription uploaded to storage bucket');
+    })
+    .catch((err) => {
+      callback(err);
+    });
 
-				// Adding a listener for the 'progress' event causes the callback to be
-				// called on any change in metadata when the operation is polled.
-				operation.on('progress', function(metadata, apiResponse) {
-					console.log(util.inspect(apiResponse, false, null));
-					console.log('Transcription of "' + audioFile.name + '" still ongoing');
-				});
-
-				// Adding a listener for the 'error' event handles any errors found during
-				// polling.
-				operation.on('error', function(err) {
-					console.error(err);
-				});
-		})
-		.catch(function(err) {
-			console.error(err);
-		});
-	};
-
-	callback(null, 'Success!');
+  callback();
 };
