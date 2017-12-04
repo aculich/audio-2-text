@@ -1,11 +1,41 @@
 {
+  "name": "audio-2-text",
+  "version": "1.0.0",
+  "description": "Audio-2-Text is a Google Cloud Functions invocation that calls Google Cloud Speech API when audio files are uploaded to Google Cloud Storage",
+  "main": "index.js",
   "dependencies": {
-    "@google-cloud/speech": "^0.10.3",
-    "@google-cloud/storage": "^1.3.0",
-    "fs": "0.0.1-security",
-    "os": "^0.1.1",
-    "path": "^0.12.7",
-    "rewrite-ext": "^1.0.0",
-    "util": "^0.10.3"
-  }
+    "eslint": "^4.12.1",
+    "eslint-config-strongloop": "^2.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "pretest": "eslint --ignore-path .gitignore ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jlaham/audio-2-text.git"
+  },
+  "keywords": [
+    "Audio-2-Text",
+    "Audio2Text",
+    "transcribe",
+    "audio",
+    "Google",
+    "Cloud",
+    "Functions",
+    "Google",
+    "Cloud",
+    "Speech",
+    "API",
+    "Google",
+    "Cloud",
+    "Storage",
+    "GCP"
+  ],
+  "author": "John Laham",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jlaham/audio-2-text/issues"
+  },
+  "homepage": "https://github.com/jlaham/audio-2-text#readme"
 }
