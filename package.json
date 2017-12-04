@@ -17,7 +17,7 @@
     "util": "^0.10.3"
   },
   "scripts": {
-    "pretest": "eslint --ignore-path .gitignore ."
+    "pretest": "eslint --ignore-path .gitignore . --fix"
   },
   "repository": {
     "type": "git",
