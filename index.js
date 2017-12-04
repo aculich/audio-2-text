@@ -50,8 +50,8 @@ exports.audio2text = function(event, callback) {
     projectId: projectId,
   });
 
-  const audioBucketName = 'audio-2-text-customer-tohpiej7ee6aevee-audio';
-  const textBucketName = 'audio-2-text-customer-tohpiej7ee6aevee-text';
+  const audioBucketName = 'AUDIO_BUCKET_NAME';
+  const textBucketName = 'TEXT_BUCKET_NAME';
 
   // var audioBucket = storage.bucket(audioBucketName);
   var textBucket = storage.bucket(textBucketName);
