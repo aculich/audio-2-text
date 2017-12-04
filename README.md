@@ -5,6 +5,7 @@ The pipeline is built on three components:
 1. Google Cloud Storage
 1. Google Cloud Functions
 1. Google Cloud Speech API
+1. Google Cloud Runtime Configuration API
 
 The workflow is as follows:
 1. Upload an audio file you want transcribed to the monitored Cloud Storage bucket
@@ -16,13 +17,13 @@ The workflow is as follows:
 ![architecture diagram](/images/architecture.png)
 
 ## Caveat
-Currently, the Cloud Function is hard-coded to only accept audio files with the following characteristics:
+You need to predefine the `AUDIO_BUCKET_NAME` & `TEXT_BUCKET_NAME` variables, using the Google Cloud Runtime Configuration API, prior to deploying the Cloud Function, otherwise it will fail to run. The function depends on these env variables to be defined using the Runtime Configuration service with a configuration name of `audio2text-env-vars`.
+
+Currently, the Cloud Function is hard-coded to only accept audio files with the following specifications:
 - Format: FLAC
 - Frequency: 44,100 Hz
 - Channels: Mono (this is a Cloud Speech API requirement)
 - Language: English (US)
-
-Also, be sure to assign the proper Cloud Storage bucket names to the `audioBucketName` & `textBucketName` variables.
 
 ## Deployment
 In order to deploy the `index.js` file to a cloud function, you would first need to make sure that you have the Google Cloud SDK configured, and the Cloud Functions & Cloud Speech APIs enabled in your Google Cloud Platform API Explorer console.
