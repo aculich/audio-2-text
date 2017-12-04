@@ -4,6 +4,7 @@
   "description": "Audio-2-Text is a Google Cloud Functions invocation that calls Google Cloud Speech API when audio files are uploaded to Google Cloud Storage",
   "main": "index.js",
   "dependencies": {
+    "@google-cloud/rcloadenv": "^0.2.1",
     "@google-cloud/speech": "^0.11.0",
     "@google-cloud/storage": "^1.5.0",
     "fs": "0.0.1-security",
