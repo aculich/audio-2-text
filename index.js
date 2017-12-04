@@ -16,7 +16,7 @@ const Storage = require('@google-cloud/storage');
 
 exports.audio2text = function(event, callback) {
 
-  const file = event.data
+  const file = event.data;
 
   // Check status of uploaded object
   if (file.resourceState === 'not_exists') {
