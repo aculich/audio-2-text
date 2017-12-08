@@ -25,6 +25,8 @@ Currently, the Cloud Function is hard-coded to only accept audio files with the 
 - Channels: Mono (this is a Cloud Speech API requirement)
 - Language: English (US)
 
+Finally, as of the time of writing this README, the Serverless Framework only supports Cloud Pub/Sub events and HTTP triggers for Cloud Functions in the `serverless.yml`. Once Cloud Storage events are supported, I will probably update this repo to enable (and simplify) deployment through the use of the Serverless Framework.
+
 ## Deployment
 In order to deploy the `index.js` file to a cloud function, you would first need to make sure that you have the Google Cloud SDK configured, and the Cloud Functions & Cloud Speech APIs enabled in your Google Cloud Platform API Explorer console.
 
@@ -36,7 +38,9 @@ There are four elements that need to be defined:
 
 Once you have these buckets created and set up, and you've edited the `index.js` file to contain the proper bucket names (`audioBucketName` & `textBucketName`), you are ready to deploy the audio-2-text Cloud Function. Issuing the following `gcloud` command will deploy the function to the staging bucket and will set the trigger on the bucket to be monitored:
 
-`gcloud beta functions deploy ${FN_NAME} --stage-bucket ${FN_BUCKET} --trigger-bucket ${TRIGGER_BUCKET}`
+```
+gcloud beta functions deploy ${FN_NAME} --stage-bucket ${FN_BUCKET} --trigger-bucket ${TRIGGER_BUCKET}
+```
 
 Once that's done, all you need to do is upload an audio file to the monitored bucket, and follow the logs in your GCP console to see the status of the transcription. Once the Cloud Speech API service completes transcribing the file you should find a file in the text bucket with the same name as your original audio file, with a 'txt' extension instead.
 
