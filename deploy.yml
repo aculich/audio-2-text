@@ -1,8 +1,0 @@
-steps:
-- name: gcr.io/cloud-builders/gcloud
-  args:
-  - functions
-  - deploy
-  - ${_FUNC_NAME}
-  - --stage-bucket=${_STAGE_BUCKET}
-  - --trigger-bucket=${_TRIGGER_BUCKET}
