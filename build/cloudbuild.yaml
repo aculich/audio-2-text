@@ -9,7 +9,7 @@ steps:
     - set
     - AUDIO_BUCKET
     - ${_AUDIO_BUCKET}
-    - --config-name=${CONFIG_NAME}
+    - --config-name=${_CONFIG_NAME}
     - --is-text
   # Update environment variable for Text Bucket name
 - name: gcr.io/cloud-builders/gcloud
@@ -21,7 +21,7 @@ steps:
     - set
     - TEXT_BUCKET
     - ${_TEXT_BUCKET}
-    - --config-name=${CONFIG_NAME}
+    - --config-name=${_CONFIG_NAME}
     - --is-text
   # Deploy Cloud Function
 - name: gcr.io/cloud-builders/gcloud
