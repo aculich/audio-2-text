@@ -19,12 +19,11 @@ exports.audio2text = function(event, callback) {
   const file = event.data;
 
   if (file.metageneration === '1') {
-    console.log('Function triggered');
-    console.log('File name: ' + file.name);
+    console.log('INFO: New file uploaded');
+    console.log('INFO: File name: ' + file.name);
   } else {
-    console.log('Function triggered');
-    console.log('File metadata changed');
-    console.log('File name: ' + file.name);
+    console.log('INFO: Existing file changed');
+    console.log('INFO: File name: ' + file.name);
   }
 
   // Read environment variables from Runtime Configurator
@@ -105,10 +104,11 @@ exports.audio2text = function(event, callback) {
           textBucket.upload(tempFilePath, (err) => {
             if (err) { throw new Error(err); }
           });
-          console.log('Transcription uploaded to storage bucket');
+          console.log('INFO: Transcription uploaded to storage bucket');
         })
         .catch((err) => {
           // Send error callback
+          console.error('ERROR: ', err);
           callback(err);
         });
 
