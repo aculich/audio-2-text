@@ -4,14 +4,8 @@ steps:
   - beta
   - functions
   - deploy
-  - --trigger-bucket=${_TRIGGER_BUCKET}
-  - --stage-bucket=${_STAGE_BUCKET}
-  - --source=${_SRC_PATH}
-  - --entry-point=${_FUNC_NAME}
   - ${_FUNC_NAME}
-
-substitutions:
-    _FUNC_NAME: audio2text
-    _STAGE_BUCKET: audio-2-text-functions
-    _TRIGGER_BUCKET: audio-2-text-customer-tohpiej7ee6aevee-audio
-    _SRC_PATH: .
+  - --trigger-resource=${_TRIGGER_BUCKET}
+  - --trigger-event google.storage.object.finalize
+  - --entry-point=${_FUNC_NAME}
+  - --source=${_SRC_PATH}
