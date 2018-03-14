@@ -1,0 +1,17 @@
+steps:
+- name: gcr.io/cloud-builders/gcloud
+  args:
+  - beta
+  - functions
+  - deploy
+  - --trigger-bucket=${_TRIGGER_BUCKET}
+  - --stage-bucket=${_STAGE_BUCKET}
+  - --source=${_SRC_PATH}
+  - --entry-point=${_FUNC_NAME}
+  - ${_FUNC_NAME}
+
+substitutions:
+    _FUNC_NAME: audio2text
+    _STAGE_BUCKET: audio-2-text-functions
+    _TRIGGER_BUCKET: audio-2-text-customer-tohpiej7ee6aevee-audio
+    _SRC_PATH: .
