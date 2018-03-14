@@ -18,31 +18,21 @@ exports.audio2text = function(event, callback) {
 
   const file = event.data;
 
-  // Check status of uploaded object
-  if (file.resourceState === 'not_exists') {
-    console.log('File was deleted from audio storage bucket');
-    console.log('File name: ' + file.name);
-    console.log('Nothing to do');
-    console.log('Function execution ending');
-    callback();
-  }
-
   if (file.metageneration === '1') {
-    console.log('New file uploaded to audio storage bucket');
+    console.log('Function triggered');
     console.log('File name: ' + file.name);
   } else {
-    console.log('Existing file metadata updated in audio storage bucket');
+    console.log('Function triggered');
+    console.log('File metadata changed');
     console.log('File name: ' + file.name);
   }
-
-  console.log('Beginning transcription process');
 
   // Read environment variables from Runtime Configurator
   RuntimeConfigurator.getAndApply('audio2text-env-vars')
     .then(() => {
       // Set local variables based on env variables
-      const audioBucketName = process.env.AUDIO_BUCKET_NAME;
-      const textBucketName = process.env.TEXT_BUCKET_NAME;
+      const audioBucketName = process.env.AUDIO_BUCKET;
+      const textBucketName = process.env.TEXT_BUCKET;
       const projectId = process.env.GCLOUD_PROJECT;
 
       // Create Google Cloud Storage object
@@ -55,7 +45,7 @@ exports.audio2text = function(event, callback) {
         projectId: projectId,
       });
 
-      // Create storage bucket object for TEXT_BUCKET
+      // Create storage bucket handler for TEXT_BUCKET
       var textBucket = storage.bucket(textBucketName);
 
       // Define audio file specifications
@@ -63,28 +53,28 @@ exports.audio2text = function(event, callback) {
       const sampleRateHertz = 44100;
       const languageCode = 'en-US';
 
-      // Define audio file path on Google Cloud Storage
+      // Set Google Cloud Storage audio file path
       const uri = 'gs://' + audioBucketName + '/' + file.name;
 
-      // Create audio file config object
+      // Create Speech API config object for audio file
       const config = {
         encoding: encoding,
         sampleRateHertz: sampleRateHertz,
         languageCode: languageCode,
       };
 
-      // Create audio file destination description object
+      // Set audio file URI for Speech API
       const audio = {
         uri: uri,
       };
 
-      // Create request configuration object for Speech API request
+      // Create Speech API request object
       const request = {
         config: config,
         audio: audio,
       };
 
-      // Execute Cloud Speech API call
+      // Execute Speech API call
       speech.longRunningRecognize(request)
         .then((responses) => {
 
