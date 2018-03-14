@@ -5,7 +5,5 @@ steps:
   - functions
   - deploy
   - ${_FUNC_NAME}
-  - --trigger-resource=${_TRIGGER_BUCKET}
-  - --trigger-event google.storage.object.finalize
-  - --entry-point=${_FUNC_NAME}
-  - --source=${_SRC_PATH}
+  - --stage-bucket=${_STAGE_BUCKET}
+  - --trigger-bucket=${_TRIGGER_BUCKET}
