@@ -1,12 +1,36 @@
-# Introduction
-Audio-2-Text is part of a serverless transcription pipeline built on Google Cloud Platform. The main element included in this pipeline is the Google Cloud Function code that is deployed to be triggered by a Google Cloud Storage object change notification trigger.
+# Overview
+Audio-2-Text is a serverless speech-to-text transcription pipeline built on Google Cloud Platform. The main element included in this pipeline is the Google Cloud Function code that is triggered by a Google Cloud Storage object change notification trigger.
 
+## Components
 The pipeline is built on three components:
 1. Google Cloud Storage
 1. Google Cloud Functions
 1. Google Cloud Speech API
-1. Google Cloud Runtime Configuration API
 
+This pipeline also takes advantage of two more GCP services in order to automate the build process and abstract configuration variables by setting them in environment variables:
+1. Google Cloud Container Builder
+1. Google Cloud Runtime Configurator
+
+## Build Process
+For a first time build you would need to create a new runtime-config resource which is referenced below as ${CONFIG_NAME}.
+
+`gcloud beta runtime-config configs create ${CONFIG_NAME} --description ${DESCRIPTION}`
+
+Once created you will need to set up a Container Builder trigger using the `build/cloudbuild.yaml` declaration file. This file consists of a multi-step build process.
+1. Set the environment variable `AUDIO_BUCKET` to the name of the GCS bucket where audio files will be uploaded.
+1. Set the environment variable `TEXT_BUCKET` to the name of the GCS bucket where the Cloud Function will upload text files.
+1. Deploy the Cloud Function
+
+These are the substitutions that you must set in your build trigger
+1. `_AUDIO_BUCKET`: The bucket where audio files will be uploaded
+1. `_TEXT_BUCKET`: The bucket where the Cloud Function will upload text files
+1. `_CONFIG_NAME`: The name of the runtime-config resource created above
+1. `_FUNC_NAME`: The name of the Cloud Function
+1. `_STAGE_BUCKET`: The staging bucket for the Cloud Function
+
+N.B. The Cloud Function's service account needs object creator permissions on `_TEXT_BUCKET`.
+
+## Workflow
 The workflow is as follows:
 1. Upload an audio file you want transcribed to the monitored Cloud Storage bucket
 1. The upload of an object triggers an object change notification, which triggers a Cloud Function
@@ -17,31 +41,13 @@ The workflow is as follows:
 ![architecture diagram](/images/architecture.png)
 
 ## Caveat
-You need to predefine the `AUDIO_BUCKET_NAME` & `TEXT_BUCKET_NAME` variables, using the Google Cloud Runtime Configuration API, prior to deploying the Cloud Function, otherwise it will fail to run. The function depends on these env variables to be defined using the Runtime Configuration service with a configuration name of `audio2text-env-vars`.
-
 Currently, the Cloud Function is hard-coded to only accept audio files with the following specifications:
 - Format: FLAC
 - Frequency: 44,100 Hz
 - Channels: Mono (this is a Cloud Speech API requirement)
 - Language: English (US)
 
-Finally, as of the time of writing this README, the Serverless Framework only supports Cloud Pub/Sub events and HTTP triggers for Cloud Functions in the `serverless.yml`. Once Cloud Storage events are supported, I will probably update this repo to enable (and simplify) deployment through the use of the Serverless Framework.
-
 ## Deployment
-In order to deploy the `index.js` file to a cloud function, you would first need to make sure that you have the Google Cloud SDK configured, and the Cloud Functions & Cloud Speech APIs enabled in your Google Cloud Platform API Explorer console.
-
-There are four elements that need to be defined:
-1. `FN_NAME`: The name of the function (within the `index.js` file) that will be deployed to be triggered.
-1. `FN_BUCKET`: The name of the Cloud Storage bucket where you will 'stage' the code of the Cloud Function.
-1. `TRIGGER_BUCKET`: The name of the Cloud Storage bucket that you want apply the trigger on so that whenever an object within this bucket is changed, the function is triggered.
-1. You would need to create a destination bucket where the function can upload the transcribed txt file that it receives from the Cloud Speech API
-
-Once you have these buckets created and set up, and you've edited the `index.js` file to contain the proper bucket names (`audioBucketName` & `textBucketName`), you are ready to deploy the audio-2-text Cloud Function. Issuing the following `gcloud` command will deploy the function to the staging bucket and will set the trigger on the bucket to be monitored:
-
-```
-gcloud beta functions deploy ${FN_NAME} --stage-bucket ${FN_BUCKET} --trigger-bucket ${TRIGGER_BUCKET}
-```
-
 Once that's done, all you need to do is upload an audio file to the monitored bucket, and follow the logs in your GCP console to see the status of the transcription. Once the Cloud Speech API service completes transcribing the file you should find a file in the text bucket with the same name as your original audio file, with a 'txt' extension instead.
 
 Enjoy!
