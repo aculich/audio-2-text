@@ -6,14 +6,14 @@
   "dependencies": {
     "@google-cloud/rcloadenv": "^0.2.1",
     "@google-cloud/speech": "^0.11.0",
-    "@google-cloud/storage": "^1.5.0",
+    "@google-cloud/storage": "^1.6.0",
     "fs": "0.0.1-security",
     "os": "^0.1.1",
     "path": "^0.12.7",
     "rewrite-ext": "^1.0.0"
   },
   "devDependencies": {
-    "eslint": "^4.12.1",
+    "eslint": "^4.18.2",
     "eslint-config-strongloop": "^2.1.0",
     "util": "^0.10.3"
   },
