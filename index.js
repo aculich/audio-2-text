@@ -16,8 +16,11 @@ const RuntimeConfigurator = require('@google-cloud/rcloadenv');
 
 exports.audio2text = function(event, callback) {
 
+  // Assign event data to local object 'file'
   const file = event.data;
 
+  // Assess the type of object change notification received that triggered the
+  // function's execution
   if (file.metageneration === '1') {
     console.log('INFO: New file uploaded');
     console.log('INFO: File name: ' + file.name);
@@ -27,39 +30,46 @@ exports.audio2text = function(event, callback) {
   }
 
   // Read environment variables from Runtime Configurator
-  RuntimeConfigurator.getAndApply('audio2text-env-vars')
+  RuntimeConfigurator
+    .getAndApply('audio2text-env-vars')
     .then(() => {
-      // Set local variables based on env variables
+      // Set local objects to env variable values
       const audioBucketName = process.env.AUDIO_BUCKET;
       const textBucketName = process.env.TEXT_BUCKET;
       const projectId = process.env.GCLOUD_PROJECT;
 
-      // Create Google Cloud Storage object
+      // Create Google Cloud Storage handler object
       const storage = new Storage({
         projectId: projectId,
       });
 
-      // Create Google Cloud Speech API object
+      // Create Google Cloud Speech API client handler object
       const speech = new Speech.SpeechClient({
         projectId: projectId,
       });
 
-      // Create storage bucket handler for TEXT_BUCKET
-      var textBucket = storage.bucket(textBucketName);
-
       // Define audio file specifications
+      //
+      // Audio file specification is currently set statically to:
+      // Language: English
+      // Channels: Mono
+      // Codec: FLAC
+      // Sample rate: 44.1 kHz
+      //
+      // Future version of this code should be able to detect audio file format,
+      // or receive it from an external source
       const encoding = 'FLAC';
       const sampleRateHertz = 44100;
       const languageCode = 'en-US';
 
-      // Set Google Cloud Storage audio file path
+      // Set Google Cloud Storage URI for audio file object to be written
       const uri = 'gs://' + audioBucketName + '/' + file.name;
 
       // Create Speech API config object for audio file
       const config = {
         encoding: encoding,
         sampleRateHertz: sampleRateHertz,
-        languageCode: languageCode,
+        languageCode: languageCode
       };
 
       // Set audio file URI for Speech API
@@ -70,14 +80,13 @@ exports.audio2text = function(event, callback) {
       // Create Speech API request object
       const request = {
         config: config,
-        audio: audio,
+        audio: audio
       };
 
       // Execute Speech API call
       speech.longRunningRecognize(request)
         .then((responses) => {
-
-          // Operation promise starts polling for the completion of the LRO.
+          // Operation promise starts polling for the completion of the Long Runnoing Operation (LRO).
           return responses[0].promise();
         })
         .then((responses) => {
@@ -88,23 +97,41 @@ exports.audio2text = function(event, callback) {
             .map(result => result.alternatives[0].transcript)
             .join('\n');
 
+
+
+          // HERE WE WRITE THE FILE TO THE LOCAL FS; INSTEAD WE WANT TO WRITE IT DIRECTLY TO  GCS OBJECT //
+
+
+
           // Construct temp text file name by adding '.txt' extension
           const fileName = rewrite(file.name, '.txt');
 
           // Construct absolute path for temp text file
-          const tempFilePath = path.join(os.tmpdir(), fileName);
+          //const tempFilePath = path.join(os.tmpdir(), fileName);
 
           // Write temp text file to local filesystem
-          fs.writeFile(tempFilePath, transcription, (err) => {
-            if (err) { throw new Error(err); }
-          });
+          //fs.writeFile(tempFilePath, transcription, (err) => {
+          //  if (err) { throw new Error(err); }
+          //});
+
+          // Create storage bucket handler for bucket set as 'TEXT_BUCKET'
+          const textBucket = storage.bucket(textBucketName);
+          const audioFile = textBucket.file(fileName);
+          audioFile
+            .save(transcription)
+            .then(() => {
+              console.log('INFO: Transcription uploaded to storage bucket');
+            });
 
           // Upload temp text file from local filesystem to TEXT_BUCKET
           // Google Cloud Storage bucket
-          textBucket.upload(tempFilePath, (err) => {
-            if (err) { throw new Error(err); }
-          });
-          console.log('INFO: Transcription uploaded to storage bucket');
+          //textBucket.upload(tempFilePath, (err) => {
+          //  if (err) { throw new Error(err); }
+          //});
+
+          //////////////////////////////////////////////////////////////////////
+
+          //console.log('INFO: Transcription uploaded to storage bucket');
         })
         .catch((err) => {
           // Send error callback
