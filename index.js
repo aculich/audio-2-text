@@ -86,7 +86,8 @@ exports.audio2text = function(event, callback) {
       // Execute Speech API call
       speech.longRunningRecognize(request)
         .then((responses) => {
-          // Operation promise starts polling for the completion of the Long Runnoing Operation (LRO).
+          // Operation promise starts polling for the completion of the Long
+          // Running Operation (LRO).
           return responses[0].promise();
         })
         .then((responses) => {
@@ -97,26 +98,9 @@ exports.audio2text = function(event, callback) {
             .map(result => result.alternatives[0].transcript)
             .join('\n');
 
-
-
-          // HERE WE WRITE THE FILE TO THE LOCAL FS; INSTEAD WE WANT TO WRITE IT DIRECTLY TO  GCS OBJECT //
-
-
-
           // Construct temp text file name by adding '.txt' extension
           const fileName = rewrite(file.name, '.txt');
 
-          // Construct absolute path for temp text file
-          //const tempFilePath = path.join(os.tmpdir(), fileName);
-
-          // Write temp text file to local filesystem
-          //fs.writeFile(tempFilePath, transcription, (err) => {
-          //  if (err) { throw new Error(err); }
-          //});
-
-          // Create storage bucket handler for bucket set as 'TEXT_BUCKET'
-          // const textBucket = storage.bucket(textBucketName);
-          // const audioFile = textBucket.file(fileName);
           storage
             .bucket(textBucketName)
             .file(fileName)
@@ -126,16 +110,6 @@ exports.audio2text = function(event, callback) {
                 'INFO: Transcribed text uploaded to gs://' + textBucketName + '/' + fileName
               );
             });
-
-          // Upload temp text file from local filesystem to TEXT_BUCKET
-          // Google Cloud Storage bucket
-          //textBucket.upload(tempFilePath, (err) => {
-          //  if (err) { throw new Error(err); }
-          //});
-
-          //////////////////////////////////////////////////////////////////////
-
-          //console.log('INFO: Transcription uploaded to storage bucket');
         })
         .catch((err) => {
           // Send error callback
@@ -150,6 +124,4 @@ exports.audio2text = function(event, callback) {
       // Send error callback
       callback(err);
     });
-
-  // callback();
 };
