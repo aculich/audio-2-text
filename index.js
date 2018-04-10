@@ -115,12 +115,16 @@ exports.audio2text = function(event, callback) {
           //});
 
           // Create storage bucket handler for bucket set as 'TEXT_BUCKET'
-          const textBucket = storage.bucket(textBucketName);
-          const audioFile = textBucket.file(fileName);
-          audioFile
+          // const textBucket = storage.bucket(textBucketName);
+          // const audioFile = textBucket.file(fileName);
+          storage
+            .bucket(textBucketName)
+            .file(fileName)
             .save(transcription)
             .then(() => {
-              console.log('INFO: Transcription uploaded to storage bucket');
+              console.log(
+                'INFO: Transcribed text uploaded to gs://' + textBucketName + '/' + fileName
+              );
             });
 
           // Upload temp text file from local filesystem to TEXT_BUCKET

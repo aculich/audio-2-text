@@ -13,7 +13,7 @@
     "rewrite-ext": "^1.0.0"
   },
   "devDependencies": {
-    "eslint": "^4.18.2",
+    "eslint": "^4.19.1",
     "eslint-config-strongloop": "^2.1.0",
     "util": "^0.10.3"
   },
