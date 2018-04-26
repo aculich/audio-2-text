@@ -6,9 +6,6 @@
  * @param {function} callback The callback function.
  */
 
-const fs = require('fs');
-const os = require('os');
-const path = require('path');
 const rewrite = require('rewrite-ext');
 const Speech = require('@google-cloud/speech');
 const Storage = require('@google-cloud/storage');
