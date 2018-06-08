@@ -47,7 +47,7 @@ exports.audio2text = function(event, callback) {
 
       // Define audio file specifications
       //
-      // Audio file specification is currently set statically to:
+      // Audio file specification is currently set statically as:
       // Language: English
       // Channels: Mono
       // Codec: FLAC
