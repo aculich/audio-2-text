@@ -11,7 +11,7 @@ const Speech = require('@google-cloud/speech');
 const Storage = require('@google-cloud/storage');
 const RuntimeConfigurator = require('@google-cloud/rcloadenv');
 
-exports.audio2text = function(event, callback) {
+exports.audio2text = (event, callback) => {
 
   // Assign event data to local object 'file'
   const file = event.data;
