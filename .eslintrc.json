@@ -1,5 +1,8 @@
 {
-	"extends": [ "eslint:recommended", "strongloop" ],
+	"extends": [
+		"eslint:recommended",
+		"strongloop"
+	],
 	"env": {
 		"es6": true,
 		"browser": false,
@@ -7,12 +10,11 @@
 		"jquery": false
 	},
 	"rules": {
-		"strict": "off",
+		"strict": "on",
 		"no-console": "off"
 	},
 	"parserOptions": {
 		"ecmaVersion": 6,
 		"sourceType": "module",
-		"ecmaFeatures": { "jsx": true }
 	}
 }
