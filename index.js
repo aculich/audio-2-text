@@ -12,19 +12,18 @@ const Storage = require('@google-cloud/storage');
 const RuntimeConfigurator = require('@google-cloud/rcloadenv');
 
 exports.audio2text = (data, context) => {
-
   // Assign event data to local object 'file'
   const file = data;
 
   // Assess the type of object change notification received that triggered the
   // function's execution
-  if (file.metageneration === '1') {
-    console.log('INFO: New file uploaded');
-    console.log('INFO: File name: ' + file.name);
-  } else {
-    console.log('INFO: Existing file changed');
-    console.log('INFO: File name: ' + file.name);
-  }
+  console.log(`  Event ${context.eventId}`);
+  console.log(`  Event Type: ${context.eventType}`);
+  console.log(`  Bucket: ${file.bucket}`);
+  console.log(`  File: ${file.name}`);
+  console.log(`  Metageneration: ${file.metageneration}`);
+  console.log(`  Created: ${file.timeCreated}`);
+  console.log(`  Updated: ${file.updated}`);
 
   // Read environment variables from Runtime Configurator
   RuntimeConfigurator
@@ -60,7 +59,7 @@ exports.audio2text = (data, context) => {
       const languageCode = 'en-US';
 
       // Set Google Cloud Storage URI for audio file object to be written
-      const uri = 'gs://' + audioBucketName + '/' + file.name;
+      const uri = `gs://${audioBucketName}/${file.name}`;
 
       // Create Speech API config object for audio file
       const config = {
@@ -104,21 +103,15 @@ exports.audio2text = (data, context) => {
             .save(transcription)
             .then(() => {
               console.log(
-                'INFO: Transcribed text uploaded to gs://' + textBucketName + '/' + fileName
+                `INFO: Transcribed text uploaded to gs://${textBucketName}/${fileName}`
               );
             });
         })
         .catch((err) => {
-          // Send error callback
-          console.error('ERROR: ', err);
-          callback(err);
+          console.error(` Error1: ${err}`)
         });
-
-      // Send success callback
-      callback();
     })
     .catch((err) => {
-      // Send error callback
-      callback(err);
+      console.error(` Error2: ${err}`);
     });
 };
