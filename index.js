@@ -2,8 +2,8 @@
  * Audio-2-Text is a background Cloud Function that is triggered by an object
  * change notification event from a Cloud Storage bucket.
  *
- * @param {object} event The Cloud Functions event.
- * @param {function} callback The callback function.
+ * @param {object} data The event payload.
+ * @param {object} context The event metadata.
  */
 
 const rewrite = require('rewrite-ext');
@@ -11,10 +11,10 @@ const Speech = require('@google-cloud/speech');
 const Storage = require('@google-cloud/storage');
 const RuntimeConfigurator = require('@google-cloud/rcloadenv');
 
-exports.audio2text = (event, callback) => {
+exports.audio2text = (data, context) => {
 
   // Assign event data to local object 'file'
-  const file = event.data;
+  const file = data;
 
   // Assess the type of object change notification received that triggered the
   // function's execution
