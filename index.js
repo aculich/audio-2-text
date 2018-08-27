@@ -12,7 +12,6 @@ const Storage = require('@google-cloud/storage');
 const RuntimeConfigurator = require('@google-cloud/rcloadenv');
 
 exports.audio2text = (data, context) => {
-
   // Assign event data to local object 'file'
   const file = data;
 
@@ -25,7 +24,6 @@ exports.audio2text = (data, context) => {
   console.log(`  Metageneration: ${file.metageneration}`);
   console.log(`  Created: ${file.timeCreated}`);
   console.log(`  Updated: ${file.updated}`);
-
 
   // Read environment variables from Runtime Configurator
   RuntimeConfigurator
@@ -110,16 +108,10 @@ exports.audio2text = (data, context) => {
             });
         })
         .catch((err) => {
-          // Send error callback
-          console.error('ERROR: ', err);
-          callback(err);
+          console.error(` Error1: ${err}`)
         });
-
-      // Send success callback
-      callback();
     })
     .catch((err) => {
-      // Send error callback
-      callback(err);
+      console.error(` Error2: ${err}`);
     });
 };
