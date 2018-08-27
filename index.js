@@ -59,7 +59,7 @@ exports.audio2text = (data, context) => {
       const languageCode = 'en-US';
 
       // Set Google Cloud Storage URI for audio file object to be written
-      const uri = 'gs://' + audioBucketName + '/' + file.name;
+      const uri = `gs://${audioBucketName}/${file.name}`;
 
       // Create Speech API config object for audio file
       const config = {
@@ -103,7 +103,7 @@ exports.audio2text = (data, context) => {
             .save(transcription)
             .then(() => {
               console.log(
-                'INFO: Transcribed text uploaded to gs://' + textBucketName + '/' + fileName
+                `INFO: Transcribed text uploaded to gs://${textBucketName}/${fileName}`
               );
             });
         })
