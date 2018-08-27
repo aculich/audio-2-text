@@ -18,13 +18,14 @@ exports.audio2text = (data, context) => {
 
   // Assess the type of object change notification received that triggered the
   // function's execution
-  if (file.metageneration === '1') {
-    console.log('INFO: New file uploaded');
-    console.log('INFO: File name: ' + file.name);
-  } else {
-    console.log('INFO: Existing file changed');
-    console.log('INFO: File name: ' + file.name);
-  }
+  console.log(`  Event ${context.eventId}`);
+  console.log(`  Event Type: ${context.eventType}`);
+  console.log(`  Bucket: ${file.bucket}`);
+  console.log(`  File: ${file.name}`);
+  console.log(`  Metageneration: ${file.metageneration}`);
+  console.log(`  Created: ${file.timeCreated}`);
+  console.log(`  Updated: ${file.updated}`);
+
 
   // Read environment variables from Runtime Configurator
   RuntimeConfigurator
